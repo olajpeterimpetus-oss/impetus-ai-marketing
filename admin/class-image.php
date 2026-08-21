@@ -43,7 +43,7 @@ class Impetus_AI_Image {
 
         // Submit to fal.ai queue
         $submit = wp_remote_post( 'https://queue.fal.run/fal-ai/ideogram-v4/instant', array(
-            'timeout' => 30,
+            'timeout' => 60,
             'headers' => array(
                 'Content-Type'  => 'application/json',
                 'Authorization' => 'Key ' . $this->fal_key,
@@ -67,9 +67,9 @@ class Impetus_AI_Image {
         $request_id  = $submit_body['request_id'];
         $status_url  = 'https://queue.fal.run/fal-ai/ideogram-v4/instant/requests/' . $request_id;
 
-        // Poll for result (max 60 sec)
+        // Poll for result (max 90 sec)
         $image_url = null;
-        for ( $i = 0; $i < 20; $i++ ) {
+        for ( $i = 0; $i < 30; $i++ ) {
             sleep( 3 );
             $status = wp_remote_get( $status_url . '/status', array(
                 'timeout' => 15,
@@ -130,7 +130,7 @@ class Impetus_AI_Image {
         $request_id = $submit_body['request_id'];
         $status_url = 'https://queue.fal.run/fal-ai/flux-pro/v1.1/requests/' . $request_id;
 
-        for ( $i = 0; $i < 20; $i++ ) {
+        for ( $i = 0; $i < 30; $i++ ) {
             sleep( 3 );
             $status      = wp_remote_get( $status_url . '/status', array(
                 'timeout' => 15,

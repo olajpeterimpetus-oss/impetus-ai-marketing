@@ -246,6 +246,7 @@ class Impetus_AI_Generator {
             $caption = $hashtags = $image_prompt = '';
             if ( preg_match( '/"caption"\s*:\s*"((?:[^"\\\\]|\\\\.)*)"/s', $raw, $m ) ) {
                 $caption = stripslashes( $m[1] );
+                $caption = str_replace( '\n', "\n", $caption );
             }
             if ( preg_match( '/"hashtags"\s*:\s*"((?:[^"\\\\]|\\\\.)*)"/s', $raw, $m ) ) {
                 $hashtags = stripslashes( $m[1] );
@@ -257,6 +258,12 @@ class Impetus_AI_Generator {
                 return array( 'error' => 'AI valasz nem ertelmezhetoe. Probald ujra.' );
             }
             return array( 'caption' => $caption, 'hashtags' => $hashtags, 'image_prompt' => $image_prompt );
+        }
+
+        // Fix \n literal to real newlines in caption
+        if ( isset( $result["caption"] ) ) {
+            $result["caption"] = str_replace( "\n", "
+", $result["caption"] );
         }
 
         return $result;
