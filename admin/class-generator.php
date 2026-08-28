@@ -42,32 +42,45 @@ class Impetus_AI_Generator {
         $ctx = $this->get_site_context();
 
         $platform_hints = array(
-            'facebook'  => 'Facebook poszt: 100-200 szo, barati hangnem, 3-5 hashtag a vegen.',
-            'instagram' => 'Instagram caption: rovid utos elso sor, emoji-k, 5-10 hashtag a vegen.',
-            'linkedin'  => 'LinkedIn poszt: szakmai, ertekorizentalt, 150-300 szo, 3 hashtag.',
+            'facebook'  => 'Facebook poszt szabalyok: 150-250 szo, legyen tortenetmeselo, szemelyes hangnem, emoji-k hasznalata, erzelmi hook az elso sorban, konkret CTA a vegen, 3-5 hashtag.',
+            'instagram' => 'Instagram caption szabalyok: utos ELSO SOR (ez latszik elore), rovid bekezdesek, sok emoji, erzelmi vagy kerdeses nyito, 8-12 hashtag a vegen.',
+            'linkedin'  => 'LinkedIn poszt szabalyok: szakmai de szemelyes hangnem, 200-350 szo, erteket adj a olvasonak, tapasztalatot ossz meg, 3-5 hashtag.',
         );
         $hint = isset( $platform_hints[ $platform ] ) ? $platform_hints[ $platform ] : '';
 
         $brand_section = '';
         if ( ! empty( $ctx['brand_notes'] ) ) {
-            $brand_section = "Brand megjegyzesek: " . $ctx['brand_notes'] . "\n";
+            $brand_section = "Brand hangja es fo uzenetek:\n" . $ctx['brand_notes'] . "\n";
         }
 
-        $prompt = "Te egy tapasztalt magyar social media menedzser vagy.\n\n"
-            . "Weblap: " . $ctx['site_name'] . " (" . $ctx['site_url'] . ")\n"
+        $cta = ! empty( $ctx['cta_text'] ) ? $ctx['cta_text'] : 'Keress minket!';
+
+        $prompt = "Te Magyarorszag legjobb social media szovegiroja vagy. Kreatív, humorosal, erzelmileg megérintő posztokat irsz amelyek viralisan terjednek.\n\n"
+            . "== UGYFEL ADATOK ==\n"
+            . "Vallalkozas neve: " . $ctx['site_name'] . "\n"
+            . "Weboldal: " . $ctx['site_url'] . "\n"
             . "Leiras: " . $ctx['site_desc'] . "\n"
             . "Iparag: " . $ctx['industry'] . "\n"
-            . "Hangnem: " . $ctx['tone'] . "\n"
             . "Celcsoport: " . $ctx['target_audience'] . "\n"
+            . "CTA szoveg: " . $cta . "\n"
             . $brand_section . "\n"
-            . "Feladat: Irj " . ucfirst( $platform ) . " posztot errol a temarol: \"" . $topic . "\"\n"
-            . ( ! empty( $extra ) ? "Extra instrukció: " . $extra . "\n" : '' )
-            . "\n" . $hint . "\n\n"
-            . "Valaszolj KIZAROLAG JSON formatumban:\n"
+            . "== FELADAT ==\n"
+            . "Irj egy KIEMELKEDO, KREATÍV " . strtoupper( $platform ) . " posztot errol a temarol: \"" . $topic . "\"\n"
+            . ( ! empty( $extra ) ? "Kulonleges instrukció: " . $extra . "\n" : '' )
+            . "\n== IRANYELVEK ==\n"
+            . $hint . "\n"
+            . "- Az ELSO SOR legyen olyan uto, hogy meg kelljen allni es elolvasni\n"
+            . "- Hasznalj storytelling elemet, konkret szamot vagy meglepő allitast\n"
+            . "- Legyen benne erzelmi elem: humor, nosztalgia, meglepes, vagy inspiracio\n"
+            . "- A CTA (\"" . $cta . "\") legyen termeszetes, ne eroltetetett\n"
+            . "- Kerüld a kliséket: \"Ne maradj le!\", \"Nézd meg!\", \"Kattints!\"\n"
+            . "- Legyen specifikus a celcsoportra szabva\n\n"
+            . "== KIMENET ==\n"
+            . "Valaszolj KIZAROLAG valid JSON formatumban, egyeb szoveg nelkul:\n"
             . "{\n"
-            . "  \"caption\": \"a poszt szovege\",\n"
-            . "  \"hashtags\": \"#hashtag1 #hashtag2\",\n"
-            . "  \"image_prompt\": \"angol FLUX/Ideogram prompt fotorealisztikus kephez, szoveg nelkul\"\n"
+            . "  \"caption\": \"a teljes poszt szovege, sortoresekkel\\n\\n elvalasztva\",\n"
+            . "  \"hashtags\": \"#hashtag1 #hashtag2 #hashtag3\",\n"
+            . "  \"image_prompt\": \"angol nyelvu, reszletes Ideogram/FLUX prompt: fotorealisztikus hatterkep a poszthoz, szemelyek, helyszin, vilag, hangulat - SZOVEG NELKUL a kepen\"\n"
             . "}";
 
         $response = wp_remote_post( $this->api_url, array(

@@ -31,6 +31,7 @@ class Impetus_AI_Image {
     }
 
     private function generate_ideogram( $image_prompt, $topic ) {
+        @set_time_limit( 120 );
         $site_name = get_bloginfo( 'name' );
         $cta_text  = get_option( 'impetus_ai_cta_text', 'Keress minket!' );
 
@@ -72,7 +73,7 @@ class Impetus_AI_Image {
         for ( $i = 0; $i < 30; $i++ ) {
             sleep( 3 );
             $status = wp_remote_get( $status_url . '/status', array(
-                'timeout' => 15,
+                'timeout' => 30,
                 'headers' => array( 'Authorization' => 'Key ' . $this->fal_key ),
             ) );
             $status_body = json_decode( wp_remote_retrieve_body( $status ), true );
@@ -101,6 +102,7 @@ class Impetus_AI_Image {
     }
 
     private function generate_flux( $image_prompt ) {
+        @set_time_limit( 120 );
         $full_prompt = $image_prompt . ", no text, no words, clean photorealistic background, social media post background";
 
         $submit = wp_remote_post( 'https://queue.fal.run/fal-ai/flux-pro/v1.1', array(
@@ -133,7 +135,7 @@ class Impetus_AI_Image {
         for ( $i = 0; $i < 30; $i++ ) {
             sleep( 3 );
             $status      = wp_remote_get( $status_url . '/status', array(
-                'timeout' => 15,
+                'timeout' => 30,
                 'headers' => array( 'Authorization' => 'Key ' . $this->fal_key ),
             ) );
             $status_body = json_decode( wp_remote_retrieve_body( $status ), true );
